@@ -1,10 +1,39 @@
 #include <SDL2/SDL.h>
 #include "Bee.h"
 #include "Pipe.h"
+#include <cstdlib>
 #include <iostream>
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+
+
+int amount_of_pipes = 0;
+void addPipes(Pipe*& pipes, int amount_to_be_added) {
+	amount_of_pipes += amount_to_be_added;
+	pipes = (Pipe*) realloc(pipes, amount_of_pipes * sizeof(Pipe));
+
+	for (int i = amount_of_pipes - amount_to_be_added; i < amount_of_pipes; i+=2) {
+		int random_number = rand() % 320;
+
+		Pipe pipe1(
+			(SCREEN_WIDTH + 80 * (2 * i)),
+			(300 + (rand() % 120)), 
+			80,
+			SCREEN_HEIGHT
+		);
+
+		Pipe pipe2(
+			(SCREEN_WIDTH + 80 * (2 * i)),
+			(300 + (rand() % 120)) * -1, 
+			80,
+			SCREEN_HEIGHT
+		); 
+
+		pipes[i] = pipe1;
+		pipes[i+1] = pipe2;
+	}	
+}
 
 int main(int argc, char* argv[]) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -24,17 +53,10 @@ int main(int argc, char* argv[]) {
 
 	Bee bee(50, SCREEN_HEIGHT/2-60, 10, 10);
 
-	Pipe pipes[3];
+	Pipe* pipes = (Pipe*) malloc(amount_of_pipes * sizeof(Pipe));
+	addPipes(pipes, 20);
 
-	for (int i = 0; i < 3; i++) {
-		Pipe pipe(
-			(SCREEN_WIDTH + 80 * (i+1)) + (i == 1 ? 80 : i == 2 ? 120 : 0),
-			120 * (i+1), 
-			80, 	
-			SCREEN_HEIGHT
-		);
-		pipes[i] = pipe;
-	}
+	float pipe_spawn_timer = 0;
 
 	double delta = 0;
 	Uint32 now = SDL_GetPerformanceCounter();
@@ -70,10 +92,16 @@ int main(int argc, char* argv[]) {
 			bee.die();
 		}
 
-		for (int i = 0; i < 3; i++) {
-			Pipe& pipe = pipes[i];
-			pipe.update(delta);
-			pipe.draw(renderer);
+		for (int i = 0; i < amount_of_pipes; i++) {
+			Pipe* pipe = &pipes[i];
+			pipe->update(delta);
+			pipe->draw(renderer);
+		}
+
+		pipe_spawn_timer += delta;
+		if (pipe_spawn_timer > 1) {
+			addPipes(pipes, 20);
+			pipe_spawn_timer = 0;
 		}
 
 		SDL_RenderPresent(renderer);
@@ -86,6 +114,9 @@ int main(int argc, char* argv[]) {
 			SDL_Delay(1000 / 60 - t);
 		}
 	}
+
+	free(pipes);
+	pipes = nullptr;
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
