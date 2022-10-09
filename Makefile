@@ -3,8 +3,8 @@ CXX = g++
 CFLAGS = -IDependencies/include -Wall
 LDFLAGS = -LDependencies/lib -lmingw32 -lSDL2main -lSDL2
 
-SRC = game.cpp Bee.cpp
-OBJ = game.o Bee.o
+SRC = game.cpp Bee.cpp Pipe.cpp
+OBJ = game.o Bee.o Pipe.o
 
 
 all: game
@@ -18,6 +18,9 @@ game.o: game.cpp
 
 Bee.o: Bee.cpp
 	$(CXX) -c Bee.cpp $(CFLAGS)
+
+Pipe.o: Pipe.cpp
+	$(CXX) -c Pipe.cpp $(CFLAGS)
 
 clean:
 	DEL $(OBJ)

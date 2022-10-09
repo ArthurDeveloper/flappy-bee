@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include "Bee.h"
+#include "Pipe.h"
 #include <iostream>
 
 #define SCREEN_WIDTH 640
@@ -20,7 +21,20 @@ int main(int argc, char* argv[]) {
 	surface = SDL_GetWindowSurface(window);
 	renderer = SDL_CreateRenderer(window, 0, 0);
 
+
 	Bee bee(50, SCREEN_HEIGHT/2-60, 10, 10);
+
+	Pipe pipes[3];
+
+	for (int i = 0; i < 3; i++) {
+		Pipe pipe(
+			(SCREEN_WIDTH + 80 * (i+1)) + (i == 1 ? 80 : i == 2 ? 120 : 0),
+			120 * (i+1), 
+			80, 	
+			SCREEN_HEIGHT
+		);
+		pipes[i] = pipe;
+	}
 
 	double delta = 0;
 	Uint32 now = SDL_GetPerformanceCounter();
@@ -54,6 +68,12 @@ int main(int argc, char* argv[]) {
 		bee.draw(renderer);
 		if (!bee.is_between_boundaries(0, SCREEN_HEIGHT)) {
 			bee.die();
+		}
+
+		for (int i = 0; i < 3; i++) {
+			Pipe& pipe = pipes[i];
+			pipe.update(delta);
+			pipe.draw(renderer);
 		}
 
 		SDL_RenderPresent(renderer);
