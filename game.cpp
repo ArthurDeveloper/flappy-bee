@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	surface = SDL_GetWindowSurface(window);
 	renderer = SDL_CreateRenderer(window, 0, 0);
 
-	Bee bee(0, 0, 10, 10);
+	Bee bee(50, SCREEN_HEIGHT/2-60, 10, 10);
 
 	double delta = 0;
 	Uint32 now = SDL_GetPerformanceCounter();
@@ -49,10 +49,12 @@ int main(int argc, char* argv[]) {
 				}
 			}
 		}
-
-
+		
 		bee.update(delta);
 		bee.draw(renderer);
+		if (!bee.is_between_boundaries(0, SCREEN_HEIGHT)) {
+			bee.die();
+		}
 
 		SDL_RenderPresent(renderer);
 		
