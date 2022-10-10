@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include "Bee.h"
 #include "Pipe.h"
-#include <cstdlib>
+#include <list>
 #include <iostream>
 
 #define SCREEN_WIDTH 640
@@ -9,10 +9,9 @@
 
 
 int amount_of_pipes = 0;
-void addPipes(Pipe*& pipes, int amount_to_be_added) {
+void addPipes(std::list<Pipe>& pipes, int amount_to_be_added) {
 	amount_of_pipes += amount_to_be_added;
-	pipes = (Pipe*) realloc(pipes, amount_of_pipes * sizeof(Pipe));
-
+	
 	for (int i = amount_of_pipes - amount_to_be_added; i < amount_of_pipes; i+=2) {
 		int random_number = rand() % 320;
 
@@ -30,8 +29,8 @@ void addPipes(Pipe*& pipes, int amount_to_be_added) {
 			SCREEN_HEIGHT
 		); 
 
-		pipes[i] = pipe1;
-		pipes[i+1] = pipe2;
+		pipes.push_back(pipe1);
+		pipes.push_back(pipe2);
 	}	
 }
 
@@ -53,7 +52,7 @@ int main(int argc, char* argv[]) {
 
 	Bee bee(50, SCREEN_HEIGHT/2-60, 10, 10);
 
-	Pipe* pipes = (Pipe*) malloc(amount_of_pipes * sizeof(Pipe));
+	std::list<Pipe> pipes;
 	addPipes(pipes, 20);
 
 	float pipe_spawn_timer = 0;
@@ -92,14 +91,35 @@ int main(int argc, char* argv[]) {
 			bee.die();
 		}
 
-		for (int i = 0; i < amount_of_pipes; i++) {
-			Pipe* pipe = &pipes[i];
-			pipe->update(delta);
-			pipe->draw(renderer);
+		bool pop_front = false;
+		for (Pipe& pipe : pipes) {
+			pipe.update(delta);
+			pipe.draw(renderer);
+
+			if (pipe.rect.x + pipe.rect.w < 0) {
+				std::cout << amount_of_pipes << "\n";
+				//pipes.pop_front();
+				pop_front = true;
+
+				continue;
+			
+			}
 		}
 
+		if (pop_front) {
+			amount_of_pipes--;
+			pipes.pop_front();
+		}
+
+		/*for (Pipe& pipe : pipes) {
+			if (pipe.rect.y < 0) {
+				pipes.pop_back();
+				break;
+			}
+		}*/
+
 		pipe_spawn_timer += delta;
-		if (pipe_spawn_timer > 1) {
+		if (pipe_spawn_timer > 1 && pipes.size() < 100) {
 			addPipes(pipes, 20);
 			pipe_spawn_timer = 0;
 		}
@@ -114,9 +134,6 @@ int main(int argc, char* argv[]) {
 			SDL_Delay(1000 / 60 - t);
 		}
 	}
-
-	free(pipes);
-	pipes = nullptr;
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
