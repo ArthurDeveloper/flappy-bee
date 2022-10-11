@@ -85,24 +85,32 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		
-		bee.update(delta);
+		if (!bee.has_died) {
+			bee.update(delta);
+		}
 		bee.draw(renderer);
+		
 		if (!bee.is_between_boundaries(0, SCREEN_HEIGHT)) {
 			bee.die();
 		}
 
 		bool pop_front = false;
 		for (Pipe& pipe : pipes) {
-			pipe.update(delta);
+			if (!bee.has_died) {
+				// If the bee's dead, stop moving
+				pipe.update(delta);
+			}
 			pipe.draw(renderer);
 
 			if (pipe.rect.x + pipe.rect.w < 0) {
-				std::cout << amount_of_pipes << "\n";
-				//pipes.pop_front();
 				pop_front = true;
-
-				continue;
+			}
 			
+			const SDL_Rect* r1 = &bee.rect;
+			const SDL_Rect* r2 = &pipe.rect;
+			
+			if (SDL_HasIntersection(&bee.rect, &pipe.rect)) {
+				bee.die();
 			}
 		}
 
@@ -110,14 +118,7 @@ int main(int argc, char* argv[]) {
 			amount_of_pipes--;
 			pipes.pop_front();
 		}
-
-		/*for (Pipe& pipe : pipes) {
-			if (pipe.rect.y < 0) {
-				pipes.pop_back();
-				break;
-			}
-		}*/
-
+		
 		pipe_spawn_timer += delta;
 		if (pipe_spawn_timer > 1 && pipes.size() < 100) {
 			addPipes(pipes, 20);

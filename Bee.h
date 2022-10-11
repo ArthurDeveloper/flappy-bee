@@ -7,6 +7,8 @@ class Bee {
 public:
 	SDL_Rect rect;
 
+	bool has_died = false;
+
 	bool has_just_jumped = false;
 
 	int initial_x = 0;
