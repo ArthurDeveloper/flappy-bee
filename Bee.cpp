@@ -1,5 +1,7 @@
 #include "Bee.h"
 
+#define DEBUG_MODE true
+
 Bee::Bee(int x, int y, int w, int h) {
 	initial_x = x;
 	initial_y = y;

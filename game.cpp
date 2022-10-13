@@ -5,8 +5,6 @@
 #include <list>
 #include <iostream>
 
-#define DEBUG_MODE false
-
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
