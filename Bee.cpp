@@ -1,6 +1,6 @@
 #include "Bee.h"
 
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 
 Bee::Bee(int x, int y, int w, int h) {
 	initial_x = x;
@@ -72,5 +72,7 @@ void Bee::draw(SDL_Renderer* renderer) {
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderFillRect(renderer, &rect);
 	#endif
-	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	
+	int angle = y_velocity > 0 ? 15 : -15;
+	SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, NULL, SDL_FLIP_NONE);
 }
