@@ -1,8 +1,11 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "Bee.h"
 #include "Pipe.h"
 #include <list>
 #include <iostream>
+
+#define DEBUG_MODE false
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -35,8 +38,14 @@ void addPipes(std::list<Pipe>& pipes, int amount_to_be_added) {
 }
 
 int main(int argc, char* argv[]) {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
 		std::cout << "Something went wrong. Try again later.";	
+		return -1;
+	}
+
+	if (IMG_Init(IMG_INIT_PNG) == 0) {
+		std::cout << "Something went wrong. Try again later.";
+		return -1;
 	}
 
 	std::cout << "All working fine!";
@@ -50,7 +59,7 @@ int main(int argc, char* argv[]) {
 	renderer = SDL_CreateRenderer(window, 0, 0);
 
 
-	Bee bee(50, SCREEN_HEIGHT/2-60, 10, 10);
+	Bee bee(50, SCREEN_HEIGHT/2-60, 64, 64);
 
 	std::list<Pipe> pipes;
 	addPipes(pipes, 20);
@@ -137,7 +146,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	SDL_DestroyWindow(window);
+	SDL_DestroyTexture(bee.texture);
 	SDL_Quit();
+	IMG_Quit();
 
 	return 0;
 }

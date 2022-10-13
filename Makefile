@@ -1,7 +1,7 @@
 CXX = g++
 
 CFLAGS = -IDependencies/include -Wall
-LDFLAGS = -LDependencies/lib -lmingw32 -lSDL2main -lSDL2
+LDFLAGS = -LDependencies/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
 
 SRC = game.cpp Bee.cpp Pipe.cpp
 OBJ = game.o Bee.o Pipe.o

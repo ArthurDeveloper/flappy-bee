@@ -8,6 +8,14 @@ Bee::Bee(int x, int y, int w, int h) {
 	rect.y = y;
 	rect.w = w;
 	rect.h = h;
+
+	surface = IMG_Load("res/bee.png");
+	if (surface == NULL) {
+		std::cout << "Error loading image: " << IMG_GetError();
+		return;
+	}
+
+	texture = NULL;
 }
 
 void Bee::jump() {
@@ -53,6 +61,14 @@ void Bee::update(double delta) {
 }
 
 void Bee::draw(SDL_Renderer* renderer) {
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderFillRect(renderer, &rect);
+	if (texture == NULL) {
+		texture = SDL_CreateTextureFromSurface(renderer, surface);
+		SDL_FreeSurface(surface);
+	}
+	// Might be useful as a visible hitbox when debugging
+	#if DEBUG_MODE == true
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_RenderFillRect(renderer, &rect);
+	#endif
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
 }

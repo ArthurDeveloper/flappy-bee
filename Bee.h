@@ -1,10 +1,13 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <iostream>
 
 class Bee {
 public:
+	SDL_Surface* surface;
+	SDL_Texture* texture;
 	SDL_Rect rect;
 
 	bool has_died = false;
