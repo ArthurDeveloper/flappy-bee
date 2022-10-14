@@ -88,7 +88,11 @@ int main(int argc, char* argv[]) {
 			}
 
 			if (event.type == SDL_KEYDOWN) {
-				if (event.key.keysym.sym == SDLK_UP) {
+				if (
+					event.key.keysym.sym == SDLK_UP || 
+					event.key.keysym.sym == SDLK_SPACE ||
+					event.key.keysym.sym == SDLK_w
+				) {
 					bee.jump();
 				}
 
