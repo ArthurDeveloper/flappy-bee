@@ -14,8 +14,6 @@ void addPipes(std::list<Pipe>& pipes, int amount_to_be_added) {
 	amount_of_pipes += amount_to_be_added;
 	
 	for (int i = amount_of_pipes - amount_to_be_added; i < amount_of_pipes; i+=2) {
-		int random_number = rand() % 320;
-
 		Pipe pipe1(
 			(SCREEN_WIDTH + 80 * (2 * i)),
 			(300 + (rand() % 120)), 
