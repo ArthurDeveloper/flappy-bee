@@ -71,6 +71,7 @@ int main(int argc, char* argv[]) {
 	bool quit = false;
 	Uint32 t;
 	SDL_Event event;
+	bool has_restarted = false;
 	while (!quit) {
 		t = SDL_GetTicks();
 
@@ -89,6 +90,10 @@ int main(int argc, char* argv[]) {
 				if (event.key.keysym.sym == SDLK_UP) {
 					bee.jump();
 				}
+
+				if (event.key.keysym.sym == SDLK_RETURN && bee.has_died) {
+					has_restarted = true;
+				}
 			}
 		}
 		
@@ -104,7 +109,6 @@ int main(int argc, char* argv[]) {
 		bool pop_front = false;
 		for (Pipe& pipe : pipes) {
 			if (!bee.has_died) {
-				// If the bee's dead, stop moving
 				pipe.update(delta);
 			}
 			pipe.draw(renderer);
@@ -132,11 +136,44 @@ int main(int argc, char* argv[]) {
 			pipe_spawn_timer = 0;
 		}
 
+
+		if (bee.has_died) {
+			SDL_Surface* surface = IMG_Load("res/you-died-text.png");
+			if (surface == NULL) {
+				std::cout << "Surface couldn't be loaded.";
+				return -1;
+			}
+
+			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+			int width = 616;
+			int height = 192;
+			SDL_Rect rect = { SCREEN_WIDTH/2-width/2, SCREEN_HEIGHT/2-height/2, width, height };
+			SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+			if (has_restarted) {
+				SDL_DestroyTexture(texture);
+				
+				bee.has_died = false;
+				bee.rect.x = bee.initial_x;
+				bee.rect.y = bee.initial_y;
+				bee.y_velocity = 0;
+
+				pipes = {};
+				amount_of_pipes = 0;
+				addPipes(pipes, 80);
+				
+				has_restarted = false;
+			}
+		}
+
+
 		SDL_RenderPresent(renderer);
 		
 		SDL_SetRenderDrawColor(renderer, 0, 220, 255, 255);
 		SDL_RenderClear(renderer);
-	
+
+
 		t = SDL_GetTicks() - t;
 		if (t < 1000 / 60) {
 			SDL_Delay(1000 / 60 - t);

@@ -40,9 +40,7 @@ bool Bee::is_between_boundaries(int min, int max) {
 
 void Bee::die() {
 	has_died = true;
-	rect.x = initial_x;
-	rect.y = initial_y;
-	y_velocity = 0;
+//	y_velocity = 0;
 }
 
 void Bee::update(double delta) {
