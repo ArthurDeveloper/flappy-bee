@@ -49,11 +49,9 @@ int main(int argc, char* argv[]) {
 	std::cout << "All working fine!";
 
 	SDL_Window* window = nullptr;
-	SDL_Surface* surface = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
 	window = SDL_CreateWindow("Flappy bee", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	surface = SDL_GetWindowSurface(window);
 	renderer = SDL_CreateRenderer(window, 0, 0);
 
 
@@ -72,6 +70,9 @@ int main(int argc, char* argv[]) {
 	Uint32 t;
 	SDL_Event event;
 	bool has_restarted = false;
+
+	SDL_Surface* you_died_text_surface = nullptr;
+	SDL_Texture* you_died_text_texture = nullptr;
 	while (!quit) {
 		t = SDL_GetTicks();
 
@@ -116,10 +117,7 @@ int main(int argc, char* argv[]) {
 			if (pipe.rect.x + pipe.rect.w < 0) {
 				pop_front = true;
 			}
-			
-			const SDL_Rect* r1 = &bee.rect;
-			const SDL_Rect* r2 = &pipe.rect;
-			
+						
 			if (SDL_HasIntersection(&bee.rect, &pipe.rect)) {
 				bee.die();
 			}
@@ -138,22 +136,29 @@ int main(int argc, char* argv[]) {
 
 
 		if (bee.has_died) {
-			SDL_Surface* surface = IMG_Load("res/you-died-text.png");
-			if (surface == NULL) {
-				std::cout << "Surface couldn't be loaded.";
-				return -1;
-			}
+			if (you_died_text_surface == nullptr && you_died_text_texture == nullptr) {
+				you_died_text_surface = IMG_Load("res/you-died-text.png");
+				if (you_died_text_surface == NULL) {
+					std::cout << "Surface couldn't be loaded.";
+					return -1;
+				}
 
-			SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+				you_died_text_texture = SDL_CreateTextureFromSurface(renderer, you_died_text_surface);
+	
+				SDL_FreeSurface(you_died_text_surface);
+				
+				you_died_text_surface = nullptr;
+			}
 
 			int width = 616;
 			int height = 192;
 			SDL_Rect rect = { SCREEN_WIDTH/2-width/2, SCREEN_HEIGHT/2-height/2, width, height };
-			SDL_RenderCopy(renderer, texture, NULL, &rect);
+			SDL_RenderCopy(renderer, you_died_text_texture, NULL, &rect);
 
 			if (has_restarted) {
-				SDL_DestroyTexture(texture);
-				
+				SDL_DestroyTexture(you_died_text_texture);
+				you_died_text_texture = nullptr;
+
 				bee.has_died = false;
 				bee.rect.x = bee.initial_x;
 				bee.rect.y = bee.initial_y;
